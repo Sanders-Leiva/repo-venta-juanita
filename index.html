@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Precios del Negocio</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+
+<div class="container mt-4">
+    <h1 class="text-center mb-4">Lista de Precios 👵</h1>
+
+    <input type="text" id="buscador" class="form-control mb-3 p-3" placeholder="🔍 Buscar producto...">
+
+    <div id="lista-productos" class="list-group">
+        <div class="list-group-item d-flex justify-content-between align-items-center">
+            <div>
+                <h5 class="mb-0">Jabón Rey</h5>
+                <small class="text-muted">Aseo</small>
+            </div>
+            <span class="badge bg-primary rounded-pill fs-6">$2.500</span>
+        </div>
+    </div>
+
+    <hr class="my-4">
+    <div class="d-grid gap-2">
+        <button class="btn btn-outline-secondary" type="button" data-bs-toggle="collapse" data-bs-target="#adminPanel">
+            🛠️ Administrar (Agregar/Editar)
+        </button>
+    </div>
+
+    <div class="collapse mt-3" id="adminPanel">
+        <div class="card card-body">
+            <h4>Agregar Nuevo</h4>
+            <input type="text" id="nuevo-nombre" class="form-control mb-2" placeholder="Nombre del producto">
+            <input type="number" id="nuevo-precio" class="form-control mb-2" placeholder="Precio">
+            <button class="btn btn-success" onclick="guardarProducto()">Guardar</button>
+        </div>
+    </div>
+
+</div>
+
+<script src="app.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+</html>
