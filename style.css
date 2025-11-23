@@ -1,0 +1,114 @@
+/* --- FUENTE Y FONDO --- */
+:root {
+    --color-bg: #0f172a; /* Azul noche muy oscuro */
+    --color-surface: #1e293b; /* Gris azulado oscuro */
+    --color-text: #ffffff;
+    --font-family: 'Poppins', sans-serif;
+}
+
+body {
+    font-family: var(--font-family);
+    background-color: var(--color-bg);
+    color: var(--color-text);
+    /* Imagen de fondo sutil (opcional) */
+    background-image: radial-gradient(circle at top right, #1e40af 0%, transparent 25%);
+}
+
+/* TÍTULOS: BLANCO Y NEGRITA */
+h1, h2, h3, h4, h5 {
+    color: #ffffff !important;
+    font-weight: 800; /* Extra negrita */
+    letter-spacing: -0.5px;
+    text-shadow: 0 4px 10px rgba(0,0,0,0.5);
+}
+
+/* --- TARJETAS --- */
+.card {
+    background-color: var(--color-surface);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+}
+
+.admin-panel {
+    border-top: 5px solid #3b82f6; /* Línea azul arriba */
+}
+
+/* --- INPUTS --- */
+.form-control, .form-select {
+    background-color: #334155; /* Gris intermedio */
+    border: 1px solid #475569;
+    color: #fff;
+    border-radius: 8px;
+}
+.form-control:focus, .form-select:focus {
+    background-color: #334155;
+    color: #fff;
+    border-color: #60a5fa;
+    box-shadow: 0 0 0 4px rgba(96, 165, 250, 0.2);
+}
+.form-control::placeholder {
+    color: #94a3b8;
+}
+
+/* --- MODAL --- */
+.modal-content {
+    background-color: var(--color-surface);
+    border: 1px solid #475569;
+}
+.modal-header, .modal-footer {
+    border-color: #334155;
+}
+.btn-close-white {
+    filter: invert(1) grayscale(100%) brightness(200%);
+}
+
+/* --- LISTA DE PRODUCTOS --- */
+.list-group-item {
+    background-color: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    margin-bottom: 12px;
+    border-radius: 12px !important;
+    padding: 1rem 1.2rem;
+    transition: transform 0.2s;
+}
+
+.list-group-item:hover {
+    transform: translateY(-2px);
+    background-color: rgba(255, 255, 255, 0.06);
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+/* Precio Grande y Verde */
+.precio-texto {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: #4ade80; /* Verde neón */
+    text-shadow: 0 0 15px rgba(74, 222, 128, 0.3);
+    min-width: 100px;
+    text-align: right;
+}
+
+/* --- COLORES PARA TUS CATEGORÍAS (Marcas Reales) --- */
+.cat-badge { font-size: 0.8em; padding: 0.5em 0.8em; border-radius: 50px; }
+
+/* Coca Cola -> Rojo intenso */
+.cat-coca { background: linear-gradient(135deg, #ef4444, #b91c1c); color: white; }
+/* Big Cola -> Amarillo/Dorado */
+.cat-big { background: linear-gradient(135deg, #facc15, #ca8a04); color: black; font-weight: bold; }
+/* Leche -> Blanco azulado */
+.cat-leche { background: linear-gradient(135deg, #f1f5f9, #cbd5e1); color: #0f172a; font-weight: bold; }
+/* Medicamentos -> Azul cián */
+.cat-med { background: linear-gradient(135deg, #06b6d4, #0891b2); color: white; }
+/* Vitrina Izq -> Morado */
+.cat-vitrina { background: linear-gradient(135deg, #a855f7, #7e22ce); color: white; }
+/* Venta -> Verde esmeralda */
+.cat-venta { background: linear-gradient(135deg, #10b981, #059669); color: white; }
+
+/* Botones: Ajuste visual */
+.btn-action {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.5rem 1rem;
+}

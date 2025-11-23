@@ -3,38 +3,66 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Precios del Negocio</title>
+    <title>Pulpería Juanita</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<div class="container mt-4">
-    <h1 class="text-center mb-4">Lista de Precios 👵</h1>
+<div class="container my-4">
 
-    <input type="text" id="buscador" class="form-control mb-3 p-3" placeholder="🔍 Buscar producto...">
+    <header class="text-center mb-5">
+        <h1 class="display-4 fw-bold">Pulpería Juanita</h1>
+        <p class="lead text-white-50 fs-5">Administrador de Precios</p>
+    </header>
 
-    <div id="lista-productos" class="list-group">
-        <div class="text-center mt-5">
-            <div class="spinner-border text-primary" role="status">
-                <span class="visually-hidden">Cargando...</span>
+    <div class="card admin-panel mb-4">
+        <div class="card-body p-4">
+            <h4 class="card-title mb-3">➕ Agregar Nuevo Producto</h4>
+            <div class="row g-3 align-items-end">
+                <div class="col-md-4">
+                    <label for="nuevo-nombre" class="form-label text-white fw-bold">Nombre</label>
+                    <input type="text" id="nuevo-nombre" class="form-control form-control-lg" placeholder="Ej: Arroz Faisan">
+                </div>
+                <div class="col-md-3">
+                    <label for="nuevo-precio" class="form-label text-white fw-bold">Precio (C$)</label>
+                    <input type="number" id="nuevo-precio" class="form-control form-control-lg" placeholder="0">
+                </div>
+                <div class="col-md-3">
+                    <label for="nueva-categoria" class="form-label text-white fw-bold">Categoría</label>
+                    <select id="nueva-categoria" class="form-select form-select-lg">
+                        <option value="VENTA">💰 Venta General</option>
+                        <option value="COCA COLA">🥤 Coca Cola</option>
+                        <option value="BIG COLA">🥤 Big Cola</option>
+                        <option value="LECHE">🥛 Leche</option>
+                        <option value="MEDICAMENTOS">💊 Medicamentos</option>
+                        <option value="VITRINA IZQ">🖼️ Vitrina Izq</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <button class="btn btn-primary btn-lg w-100 fw-bold" onclick="guardarProducto()">
+                        Guardar
+                    </button>
+                </div>
             </div>
         </div>
     </div>
 
-    <hr class="my-4">
-
-    <div class="d-grid gap-2">
-        <button class="btn btn-outline-secondary" type="button" data-bs-toggle="collapse" data-bs-target="#adminPanel">
-            🛠️ Administrar (Agregar Nuevo)
-        </button>
-    </div>
-
-    <div class="collapse mt-3" id="adminPanel">
-        <div class="card card-body">
-            <h4>Agregar Nuevo</h4>
-            <input type="text" id="nuevo-nombre" class="form-control mb-2" placeholder="Nombre del producto (ej: Arroz)">
-            <input type="number" id="nuevo-precio" class="form-control mb-2" placeholder="Precio (ej: 2500)">
-            <button class="btn btn-success" onclick="guardarProducto()">Guardar</button>
+    <div class="card glass-card">
+        <div class="card-body p-4">
+            <input type="text" id="buscador" class="form-control form-control-lg mb-4" placeholder="🔍 Buscar producto...">
+            
+            <div id="lista-productos">
+                <div class="text-center mt-5 p-4 text-white-50">
+                    <div class="spinner-border text-primary" role="status"></div>
+                    <p class="mt-2">Cargando inventario...</p>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -43,20 +71,35 @@
 <div class="modal fade" id="modalEditar" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
-      <div class="modal-header bg-warning">
-        <h5 class="modal-title">✏️ Editar Producto</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      <div class="modal-header">
+        <h5 class="modal-title text-white">✏️ Editar Producto</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
         <input type="hidden" id="id-editar">
-        <label>Nombre:</label>
-        <input type="text" id="nombre-editar" class="form-control mb-2">
-        <label>Precio:</label>
-        <input type="number" id="precio-editar" class="form-control mb-2">
+        <div class="mb-3">
+            <label for="nombre-editar" class="form-label text-white">Nombre:</label>
+            <input type="text" id="nombre-editar" class="form-control">
+        </div>
+        <div class="mb-3">
+            <label for="precio-editar" class="form-label text-white">Precio:</label>
+            <input type="number" id="precio-editar" class="form-control">
+        </div>
+        <div class="mb-3">
+            <label for="categoria-editar" class="form-label text-white">Categoría:</label>
+            <select id="categoria-editar" class="form-select">
+                <option value="VENTA">💰 Venta General</option>
+                <option value="COCA COLA">🥤 Coca Cola</option>
+                <option value="BIG COLA">🥤 Big Cola</option>
+                <option value="LECHE">🥛 Leche</option>
+                <option value="MEDICAMENTOS">💊 Medicamentos</option>
+                <option value="VITRINA IZQ">🖼️ Vitrina Izq</option>
+            </select>
+        </div>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-        <button type="button" class="btn btn-primary" onclick="guardarCambios()">Guardar Cambios</button>
+        <button type="button" class="btn btn-success fw-bold" onclick="guardarCambios()">Guardar Cambios</button>
       </div>
     </div>
   </div>
