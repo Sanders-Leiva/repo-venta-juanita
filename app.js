@@ -1,8 +1,6 @@
-// 1. Importamos las funciones de Firebase
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getFirestore, collection, addDoc, onSnapshot, deleteDoc, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-// 2. TU CONFIGURACIÓN (¡NO BORRES TUS LLAVES!)
 const firebaseConfig = {
   apiKey: "AIzaSyD7a4qrXKMkMGfl9ZdGZiHwgMUkOeLXVI4",
   authDomain: "inventario-venta.firebaseapp.com",
@@ -13,179 +11,99 @@ const firebaseConfig = {
   measurementId: "G-K089SSRL49"
 };
 
-// 3. Inicializar
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const productosRef = collection(db, "productos");
 
-const listaHTML = document.getElementById("lista-productos");
 let todosLosProductos = [];
+let categoriaActual = "TODOS";
 
-// --- LEER PRODUCTOS (Tiempo Real) ---
 onSnapshot(productosRef, (snapshot) => {
     todosLosProductos = [];
-
-    if (snapshot.empty) {
-        listaHTML.innerHTML = `<div class="text-center p-4 text-muted"><h4>📭 Inventario vacío</h4><p>Agrega productos arriba.</p></div>`;
-        return;
-    }
-
-    // Convertimos los datos
-    snapshot.forEach((doc) => {
-        const producto = doc.data();
-        producto.id = doc.id; 
-        todosLosProductos.push(producto);
-    });
-
-    // Ordenar alfabéticamente
+    snapshot.forEach(doc => todosLosProductos.push({ ...doc.data(), id: doc.id }));
     todosLosProductos.sort((a, b) => a.nombre.localeCompare(b.nombre));
-
-    renderizarProductos(todosLosProductos);
+    actualizarMenuCategorias();
+    filtrarYMostrar();
 });
 
-// --- PINTAR EN PANTALLA ---
-function renderizarProductos(lista) {
-    listaHTML.innerHTML = ""; 
-
-    // DICCIONARIO DE COLORES (Conecta los selects con el CSS)
-    const categoryColors = {
-        "VENTA": "cat-venta",
-        "COCA COLA": "cat-coca",
-        "BIG COLA": "cat-big",
-        "LECHE": "cat-leche",
-        "MEDICAMENTOS": "cat-med",
-        "VITRINA IZQ": "cat-vitrina"
-    };
+function actualizarMenuCategorias() {
+    const menu = document.getElementById("menu-categorias");
+    const categoriasUnicas = ["TODOS", ...new Set(todosLosProductos.map(p => p.categoria))];
     
-    lista.forEach(prod => {
-        const item = document.createElement("div");
-        // Layout flexible
-        item.className = "list-group-item d-flex justify-content-between align-items-center flex-wrap";
-        
-        // Formato Moneda C$ (Nicaragua)
-        const precioFormateado = new Intl.NumberFormat('es-NI', { 
-            style: 'currency', currency: 'NIO', maximumFractionDigits: 0 
-        }).format(prod.precio);
+    menu.innerHTML = categoriasUnicas.map(cat => `
+        <button class="list-group-item list-group-item-action ${categoriaActual === cat ? 'active' : ''}" 
+                onclick="filtrarPorCat('${cat}', this)">
+            ${cat === 'TODOS' ? '🌐 Todos' : cat}
+        </button>
+    `).join('');
+}
 
-        // Color de categoría
-        const categoriaClass = categoryColors[prod.categoria] || 'bg-secondary';
+window.filtrarPorCat = (cat, element) => {
+    categoriaActual = cat;
+    document.querySelectorAll('.list-group-item').forEach(el => el.classList.remove('active'));
+    element.classList.add('active');
+    filtrarYMostrar();
+};
 
-        item.innerHTML = `
-            <div class="me-auto py-2">
-                <div class="d-flex align-items-center gap-2 mb-1">
-                    <h5 class="mb-0 fw-bold text-white text-uppercase" style="letter-spacing: 0.5px;">${prod.nombre}</h5>
-                </div>
-                <span class="badge cat-badge ${categoriaClass}">${prod.categoria}</span>
-            </div>
-            
-            <div class="d-flex align-items-center mt-3 mt-md-0">
-                
-                <span class="precio-texto me-4">${precioFormateado}</span>
-
-                <div class="d-flex gap-2"> 
-                    <button class="btn btn-outline-warning btn-action" title="Editar"
-                        onclick="prepararEdicion('${prod.id}', '${prod.nombre}', '${prod.precio}', '${prod.categoria}')">
-                        ✏️
-                    </button>
-                    <button class="btn btn-outline-danger btn-action" title="Borrar"
-                        onclick="borrarProducto('${prod.id}')">
-                        🗑️
-                    </button>
-                </div>
-
-            </div>
-        `;
-        listaHTML.appendChild(item);
+function filtrarYMostrar() {
+    const grid = document.getElementById("grid-productos");
+    const buscador = document.getElementById("buscador").value.toUpperCase();
+    
+    let filtrados = todosLosProductos.filter(p => {
+        const coincideCat = (categoriaActual === "TODOS" || p.categoria === categoriaActual);
+        const coincideBusqueda = p.nombre.includes(buscador);
+        return coincideCat && coincideBusqueda;
     });
+
+    grid.innerHTML = filtrados.map(p => {
+        const precio = new Intl.NumberFormat('es-NI', { style: 'currency', currency: 'NIO', maximumFractionDigits: 0 }).format(p.precio);
+        return `
+            <div class="col-sm-6 col-lg-4 col-xl-3">
+                <div class="item-producto h-100 d-flex flex-column justify-content-between">
+                    <div>
+                        <div class="small text-white-50 mb-1">${p.categoria}</div>
+                        <h6 class="fw-bold text-white mb-3 text-uppercase">${p.nombre}</h6>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="precio-badge">${precio}</span>
+                        <div class="btn-group">
+                            <button class="btn btn-sm text-warning" onclick="prepararEdicion('${p.id}','${p.nombre}',${p.precio},'${p.categoria}')">✏️</button>
+                            <button class="btn btn-sm text-danger" onclick="borrarProducto('${p.id}')">🗑️</button>
+                        </div>
+                    </div>
+                </div>
+            </div>`;
+    }).join('');
 }
 
-// --- 1. GUARDAR NUEVO ---
+// BUSCADOR EN TIEMPO REAL
+document.getElementById("buscador").addEventListener("input", filtrarYMostrar);
+
+// CRUD (Igual que los anteriores)
 window.guardarProducto = async () => {
-    const nombreInput = document.getElementById("nuevo-nombre");
-    const precioInput = document.getElementById("nuevo-precio");
-    const categoriaInput = document.getElementById("nueva-categoria");
-    
-    if(nombreInput.value.trim() === "" || precioInput.value === "") {
-        alert("⚠️ Por favor escribe un nombre y un precio");
-        return;
-    }
+    const n = document.getElementById("nuevo-nombre"), p = document.getElementById("nuevo-precio"), c = document.getElementById("nueva-categoria");
+    if(!n.value || !p.value) return;
+    await addDoc(productosRef, { nombre: n.value.toUpperCase().trim(), precio: Number(p.value), categoria: c.value });
+    n.value = ""; p.value = "";
+    bootstrap.Collapse.getInstance(document.getElementById('panelAgregar')).hide();
+};
 
-    try {
-        await addDoc(productosRef, {
-            nombre: nombreInput.value.toUpperCase().trim(),
-            precio: Number(precioInput.value),
-            categoria: categoriaInput.value,
-            fecha: new Date()
-        });
+window.borrarProducto = async (id) => { if(confirm("¿Borrar?")) await deleteDoc(doc(db, "productos", id)); };
 
-        // Limpiar campos
-        nombreInput.value = "";
-        precioInput.value = "";
-        // No reseteamos la categoría por si quieres agregar varios de la misma seguido
-
-    } catch (e) {
-        console.error(e);
-        alert("❌ Error al guardar");
-    }
-}
-
-// --- 2. BORRAR ---
-window.borrarProducto = async (id) => {
-    if(confirm("¿Estás seguro de borrar este producto?")) {
-        try {
-            await deleteDoc(doc(db, "productos", id));
-        } catch (e) {
-            alert("❌ Error al borrar");
-        }
-    }
-}
-
-// --- 3. EDITAR ---
-window.prepararEdicion = (id, nombre, precio, categoria) => {
+window.prepararEdicion = (id, n, p, c) => {
     document.getElementById("id-editar").value = id;
-    document.getElementById("nombre-editar").value = nombre;
-    document.getElementById("precio-editar").value = precio;
-    document.getElementById("categoria-editar").value = categoria;
-    
-    const modalEl = document.getElementById('modalEditar');
-    const modal = new bootstrap.Modal(modalEl);
-    modal.show();
-}
+    document.getElementById("nombre-editar").value = n;
+    document.getElementById("precio-editar").value = p;
+    document.getElementById("categoria-editar").value = c;
+    new bootstrap.Modal(document.getElementById('modalEditar')).show();
+};
 
 window.guardarCambios = async () => {
     const id = document.getElementById("id-editar").value;
-    const nombre = document.getElementById("nombre-editar").value;
-    const precio = document.getElementById("precio-editar").value;
-    const categoria = document.getElementById("categoria-editar").value;
-
-    try {
-        const ref = doc(db, "productos", id);
-        
-        await updateDoc(ref, {
-            nombre: nombre.toUpperCase().trim(),
-            precio: Number(precio),
-            categoria: categoria
-        });
-
-        // Cerrar modal correctamente
-        const modalEl = document.getElementById('modalEditar');
-        const modalInstance = bootstrap.Modal.getInstance(modalEl);
-        modalInstance.hide();
-
-    } catch (e) {
-        console.error(e);
-        alert("❌ Error al editar");
-    }
-}
-
-// --- BUSCADOR ---
-const inputBuscador = document.getElementById("buscador");
-inputBuscador.addEventListener("input", (e) => {
-    const texto = e.target.value.toUpperCase();
-    
-    const filtrados = todosLosProductos.filter(prod => 
-        prod.nombre.includes(texto) || prod.categoria.includes(texto)
-    );
-    
-    renderizarProductos(filtrados);
-});
+    await updateDoc(doc(db, "productos", id), {
+        nombre: document.getElementById("nombre-editar").value.toUpperCase().trim(),
+        precio: Number(document.getElementById("precio-editar").value),
+        categoria: document.getElementById("categoria-editar").value
+    });
+    bootstrap.Modal.getInstance(document.getElementById('modalEditar')).hide();
+};
